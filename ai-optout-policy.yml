@@ -1,0 +1,29 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: Creates an AI Services Opt-Out policy, which opts-out of all data collection, attached to the specified organisation root or OU
+Parameters:
+  TargetId:
+    Type: String
+    Description: The ID of the organisation root or OU to attach the policy to.
+    AllowedPattern: ^(r-[0-9a-z]{4,32})|(\d{12})|(ou-[0-9a-z]{4,32}-[a-z0-9]{8,32})$
+Resources:
+  AiOptOutPolicy:
+    Type: AWS::Organizations::Policy
+    Properties:
+      Content: >-
+        {
+          "services": {
+              "@@operators_allowed_for_child_policies": ["@@none"],
+              "default": {
+                  "@@operators_allowed_for_child_policies": ["@@none"],
+                  "opt_out_policy": {
+                      "@@operators_allowed_for_child_policies": ["@@none"],
+                      "@@assign": "optOut"
+                  }
+              }
+          }
+        }
+      Description: Opts out of all AI data collection for all AWS services
+      Name: Opt-Out of All AI Data Collection
+      TargetIds: 
+        - !Ref TargetId
+      Type: AISERVICES_OPT_OUT_POLICY
